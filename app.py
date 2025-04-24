@@ -11,17 +11,17 @@ from ta.volatility import BollingerBands, AverageTrueRange
 # Cargar el modelo
 best_model = joblib.load("modelo_nvda.pkl")
 
-# Lista de acciones que analizaremos
-tickers = ["NVDA", "AAPL"]
+# Lista de acciones: Magnificent 7
+tickers = ["NVDA", "AAPL", "MSFT", "AMZN", "META", "GOOGL", "TSLA"]
 
-# Indicadores esperados por el modelo
+# Indicadores requeridos
 features = [
     "RSI", "MACD", "MACD_Signal", "SMA_10", "EMA_10", "Momentum", "Volume",
     "bb_bbm", "bb_bbh", "bb_bbl", "bb_bandwidth",
     "atr", "cci", "adx", "roc"
 ]
 
-# Función para calcular los indicadores y preparar datos
+# Función para preparar datos
 def preparar_datos(ticker):
     df = yf.download(ticker, start="2018-01-01", end=datetime.today().strftime('%Y-%m-%d'), group_by='column')
 
@@ -69,15 +69,14 @@ def preparar_datos(ticker):
             df[col] = 0
 
     df = df[features].fillna(0)
-
     return df
 
-# Interfaz Streamlit
-st.set_page_config(page_title="Señales de Trading", layout="wide")
-st.title("📈 Dashboard de Recomendaciones de Trading")
+# Interfaz de Streamlit
+st.set_page_config(page_title="Señales Magnificent 7", layout="wide")
+st.title("📊 Dashboard de Señales de Compra: Magnificent 7")
 st.caption("Modelo entrenado con NVDA")
 
-# Generar recomendaciones
+# Aplicar modelo
 resultados = []
 
 for ticker in tickers:
@@ -96,5 +95,4 @@ for ticker in tickers:
         resultados.append({"Ticker": ticker, "Recomendación": f"⚠️ Error: {str(e)}"})
 
 # Mostrar resultados
-df_resultados = pd.DataFrame(resultados)
-st.dataframe(df_resultados.set_index("Ticker"))
+st.dataframe(pd.DataFrame(resultados).set_index("Ticker"))
