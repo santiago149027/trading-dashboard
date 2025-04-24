@@ -1,0 +1,7 @@
+streamlit
+yfinance
+ta
+xgboost
+joblib
+pandas
+numpy
